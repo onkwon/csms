@@ -24,3 +24,8 @@ async def process():
             for charger in internal.status.get_all():
                 logging.debug(f"Closing {charger.ws.remote_address}")
                 await charger.ws.close()
+        elif line == "keco":
+            for charger in internal.status.get_all():
+                await charger.cp.request_keco(vendor_id="kr.or.keco",
+                                              message_id="BatteryInfoConfiguration",
+                                              data="{\"configCnt\":\"1\"}")

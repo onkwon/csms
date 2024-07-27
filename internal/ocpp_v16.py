@@ -106,3 +106,7 @@ class ChargePoint16(cp):
     async def request_update_firmware(self, **kwargs):
         payload = call.UpdateFirmware(**kwargs)
         return await self.call(payload)
+
+    async def request_keco(self, **kwargs):
+        payload = call.DataTransfer(**kwargs)
+        return await self.call(payload)
