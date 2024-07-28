@@ -1,0 +1,146 @@
+Charger: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+	endpoint_id: string
+	serial_number: string
+	version: string
+	nr_connector: int
+	max_power: int
+	status: enum
+	info_id: int {constraint: foreign_key}
+	site_id: int {constraint: foreign_key}
+}
+
+Session: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+	charger_id: int {constraint: foreign_key}
+	connector: int
+	time_started: datetime
+	time_stopped: datetime
+	time_end: datetime
+	user_id: int {constraint: foreign_key}
+	charged_wh: int
+	started_by: enum
+	stopped_by: enum
+}
+
+ChargerInfo: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+	vendor_id: int {constraint: foreign_key}
+	model: string
+}
+
+Site: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+	location: string
+	country: enum
+	max_power: int
+	contract_power: int
+	type: enum
+	contact: string
+	note: string
+	date_registered: datetime
+	date_operated: datetime
+	status: enum
+}
+
+User: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+	gid: int {constraint: foreign_key}
+	pid: int
+	subscription_id: int {constraint: foreign_key}
+	name: string
+	address: string
+	contact: string
+	car: enum
+}
+
+UserGroup: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+  description: string
+}
+
+#ChargingProfile: {
+#	shape: sql_table
+#	id: int {constraint: primary_key}
+#}
+
+#Tariff: {
+#	shape: sql_table
+#	id: int {constraint: primary_key}
+#  currency: string
+#  cost: int
+#  flat_fee: decimal
+#  price_per_kwh: decimal
+#  price_per_hour: decimal
+#  price_per_hour_idle: decimal
+#  grace_minutes: int
+#}
+
+Subscription: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  type: enum
+  status: enum
+  valid_from: datetime
+  valid_until: datetime
+}
+
+Vendor: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+	name: string {constraint: unique}
+  contact: string
+  note: string
+}
+
+AuthenticationMethod: {
+	shape: sql_table
+	id: int {constraint: primary_key}
+	key: string {constraint: unique}
+	user_id: int {constraint: foreign_key}
+	status: enum
+  valid_from: datetime
+  valid_until: datetime
+}
+
+PaymentMethod: {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  key: string
+  user_id: int {constraint: foreign_key}
+  type: enum
+  status: enum
+  valid_from: datetime
+  valid_until: datetime
+}
+
+Payment: {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  method_id: int {constraint: foreign_key}
+  amount: int
+  currency: string
+  status: string
+  date: datetime
+  session_id: int {constraint: foreign_key}
+}
+
+Charger.info_id -> ChargerInfo.id: n:1(charger:info)
+Charger.site_id -> Site.id: n:1(charger:site)
+Session.charger_id -> Charger.id: n:1(session:charger)
+Session.user_id -> User.id: 1:1
+User.gid -> UserGroup.id
+User.pid -> User.id: User.pid -> User.id
+User.subscription_id -> Subscription.id: 1:n(user:subscription)
+Subscription.user_id -> User.id: n:1(subscription:user)
+ChargerInfo.vendor_id -> Vendor.id: n:1(charger_info:vendor)
+AuthenticationMethod.user_id -> User.id: n:1
+Payment.session_id -> Session.id: 1:1
+Payment.method_id -> PaymentMethod.id: 1:1
